@@ -1,0 +1,461 @@
+{
+  "users": {
+    "7538120752": {
+      "telegramId": 7538120752,
+      "username": "nurillo",
+      "fullName": "Nurillo Madaminov",
+      "phone": "+11234567890",
+      "companyUSDOT": "123321",
+      "role": "client",
+      "createdAt": "2026-03-04T06:54:56.408Z",
+      "lastActiveAt": "2026-03-04T09:12:12.408Z"
+    },
+    "7580242490": {
+      "telegramId": 7580242490,
+      "username": "truckdriver22",
+      "fullName": "Mike Brown",
+      "phone": "+11235557777",
+      "companyUSDOT": "445566",
+      "role": "client",
+      "createdAt": "2026-03-04T07:13:40.774Z",
+      "lastActiveAt": "2026-03-04T09:11:11.774Z"
+    },
+    "7421995521": {
+      "telegramId": 7421995521,
+      "username": "roadking87",
+      "fullName": "James Walker",
+      "phone": "+11234445555",
+      "companyUSDOT": "998877",
+      "role": "client",
+      "createdAt": "2026-03-04T07:20:12.200Z",
+      "lastActiveAt": "2026-03-04T09:10:00.200Z"
+    },
+    "7699011442": {
+      "telegramId": 7699011442,
+      "username": "dieselman",
+      "fullName": "Robert Wilson",
+      "phone": "+11239998888",
+      "companyUSDOT": "556677",
+      "role": "client",
+      "createdAt": "2026-03-04T07:30:10.000Z",
+      "lastActiveAt": "2026-03-04T09:09:22.000Z"
+    },
+    "7310087741": {
+      "telegramId": 7310087741,
+      "username": "lonestar_driver",
+      "fullName": "Daniel Rodriguez",
+      "phone": "+11237776666",
+      "companyUSDOT": "332211",
+      "role": "client",
+      "createdAt": "2026-03-04T07:40:01.100Z",
+      "lastActiveAt": "2026-03-04T09:08:44.100Z"
+    }
+  },
+
+  "messages": [
+    {
+      "id": "msg_1",
+      "userId": 7538120752,
+      "sender": "user",
+      "type": "request",
+      "service": "new_shift",
+      "text": "New Shift request",
+      "createdAt": "2026-03-04T07:11:45.825Z"
+    },
+    {
+      "id": "msg_2",
+      "userId": 7538120752,
+      "sender": "admin",
+      "type": "template",
+      "templateKey": "shift_fixed",
+      "text": "Driver started rolling again at 14:32 in Dallas, TX.",
+      "createdAt": "2026-03-04T07:12:45.825Z"
+    },
+    {
+      "id": "msg_3",
+      "userId": 7538120752,
+      "sender": "user",
+      "type": "text",
+      "text": "Thank you!",
+      "createdAt": "2026-03-04T07:13:45.825Z"
+    },
+    {
+      "id": "msg_4",
+      "userId": 7538120752,
+      "sender": "user",
+      "type": "request",
+      "service": "fix_logs",
+      "text": "Need log correction",
+      "createdAt": "2026-03-04T07:20:45.825Z"
+    },
+    {
+      "id": "msg_5",
+      "userId": 7538120752,
+      "sender": "admin",
+      "type": "template",
+      "templateKey": "logs_fixed",
+      "text": "Logs corrected. Please refresh your ELD.",
+      "createdAt": "2026-03-04T07:21:45.825Z"
+    },
+    {
+      "id": "msg_6",
+      "userId": 7538120752,
+      "sender": "user",
+      "type": "text",
+      "text": "Everything works now",
+      "createdAt": "2026-03-04T07:23:45.825Z"
+    },
+    {
+      "id": "msg_1",
+      "userId": 7538120752,
+      "sender": "user",
+      "type": "request",
+      "service": "new_shift",
+      "text": "New Shift request",
+      "createdAt": "2026-03-04T07:11:45.825Z"
+    },
+    {
+      "id": "msg_2",
+      "userId": 7538120752,
+      "sender": "admin",
+      "type": "template",
+      "templateKey": "shift_fixed",
+      "text": "Driver started rolling again at 14:32 in Dallas, TX.",
+      "createdAt": "2026-03-04T07:12:45.825Z"
+    },
+    {
+      "id": "msg_3",
+      "userId": 7538120752,
+      "sender": "user",
+      "type": "text",
+      "text": "Thank you!",
+      "createdAt": "2026-03-04T07:13:45.825Z"
+    },
+    {
+      "id": "msg_4",
+      "userId": 7538120752,
+      "sender": "user",
+      "type": "request",
+      "service": "fix_logs",
+      "text": "Need log correction",
+      "createdAt": "2026-03-04T07:20:45.825Z"
+    },
+    {
+      "id": "msg_5",
+      "userId": 7538120752,
+      "sender": "admin",
+      "type": "template",
+      "templateKey": "logs_fixed",
+      "text": "Logs corrected. Please refresh your ELD.",
+      "createdAt": "2026-03-04T07:21:45.825Z"
+    },
+    {
+      "id": "msg_6",
+      "userId": 7538120752,
+      "sender": "user",
+      "type": "text",
+      "text": "Everything works now",
+      "createdAt": "2026-03-04T07:23:45.825Z"
+    },
+    {
+      "id": "msg_1",
+      "userId": 7538120752,
+      "sender": "user",
+      "type": "request",
+      "service": "new_shift",
+      "text": "New Shift request",
+      "createdAt": "2026-03-04T07:11:45.825Z"
+    },
+    {
+      "id": "msg_2",
+      "userId": 7538120752,
+      "sender": "admin",
+      "type": "template",
+      "templateKey": "shift_fixed",
+      "text": "Driver started rolling again at 14:32 in Dallas, TX.",
+      "createdAt": "2026-03-04T07:12:45.825Z"
+    },
+    {
+      "id": "msg_3",
+      "userId": 7538120752,
+      "sender": "user",
+      "type": "text",
+      "text": "Thank you!",
+      "createdAt": "2026-03-04T07:13:45.825Z"
+    },
+    {
+      "id": "msg_4",
+      "userId": 7538120752,
+      "sender": "user",
+      "type": "request",
+      "service": "fix_logs",
+      "text": "Need log correction",
+      "createdAt": "2026-03-04T07:20:45.825Z"
+    },
+    {
+      "id": "msg_5",
+      "userId": 7538120752,
+      "sender": "admin",
+      "type": "template",
+      "templateKey": "logs_fixed",
+      "text": "Logs corrected. Please refresh your ELD.",
+      "createdAt": "2026-03-04T07:21:45.825Z"
+    },
+    {
+      "id": "msg_6",
+      "userId": 7538120752,
+      "sender": "user",
+      "type": "text",
+      "text": "Everything works now",
+      "createdAt": "2026-03-04T07:23:45.825Z"
+    },
+    {
+      "id": "msg_1",
+      "userId": 7538120752,
+      "sender": "user",
+      "type": "request",
+      "service": "new_shift",
+      "text": "New Shift request",
+      "createdAt": "2026-03-04T07:11:45.825Z"
+    },
+    {
+      "id": "msg_2",
+      "userId": 7538120752,
+      "sender": "admin",
+      "type": "template",
+      "templateKey": "shift_fixed",
+      "text": "Driver started rolling again at 14:32 in Dallas, TX.",
+      "createdAt": "2026-03-04T07:12:45.825Z"
+    },
+    {
+      "id": "msg_3",
+      "userId": 7538120752,
+      "sender": "user",
+      "type": "text",
+      "text": "Thank you!",
+      "createdAt": "2026-03-04T07:13:45.825Z"
+    },
+    {
+      "id": "msg_4",
+      "userId": 7538120752,
+      "sender": "user",
+      "type": "request",
+      "service": "fix_logs",
+      "text": "Need log correction",
+      "createdAt": "2026-03-04T07:20:45.825Z"
+    },
+    {
+      "id": "msg_5",
+      "userId": 7538120752,
+      "sender": "admin",
+      "type": "template",
+      "templateKey": "logs_fixed",
+      "text": "Logs corrected. Please refresh your ELD.",
+      "createdAt": "2026-03-04T07:21:45.825Z"
+    },
+    {
+      "id": "msg_6",
+      "userId": 7538120752,
+      "sender": "user",
+      "type": "text",
+      "text": "Everything works now",
+      "createdAt": "2026-03-04T07:23:45.825Z"
+    },
+
+    {
+      "id": "msg_7",
+      "userId": 7580242490,
+      "sender": "user",
+      "type": "request",
+      "service": "fix_logs",
+      "text": "Fix Logs request",
+      "createdAt": "2026-03-04T07:15:02.100Z"
+    },
+    {
+      "id": "msg_8",
+      "userId": 7580242490,
+      "sender": "admin",
+      "type": "text",
+      "text": "Checking your logs now",
+      "createdAt": "2026-03-04T07:16:02.100Z"
+    },
+    {
+      "id": "msg_9",
+      "userId": 7580242490,
+      "sender": "admin",
+      "type": "template",
+      "templateKey": "logs_fixed",
+      "text": "Logs corrected. Please refresh your ELD.",
+      "createdAt": "2026-03-04T07:17:02.100Z"
+    },
+    {
+      "id": "msg_10",
+      "userId": 7580242490,
+      "sender": "user",
+      "type": "text",
+      "text": "Got it thanks",
+      "createdAt": "2026-03-04T07:18:02.100Z"
+    },
+    {
+      "id": "msg_11",
+      "userId": 7580242490,
+      "sender": "user",
+      "type": "request",
+      "service": "new_cycle",
+      "text": "Need new cycle",
+      "createdAt": "2026-03-04T07:25:02.100Z"
+    },
+    {
+      "id": "msg_12",
+      "userId": 7580242490,
+      "sender": "admin",
+      "type": "template",
+      "templateKey": "cycle_reset",
+      "text": "Cycle reset completed.",
+      "createdAt": "2026-03-04T07:26:02.100Z"
+    },
+
+    {
+      "id": "msg_13",
+      "userId": 7421995521,
+      "sender": "user",
+      "type": "request",
+      "service": "break",
+      "text": "Need to add 30 min break",
+      "createdAt": "2026-03-04T07:30:22.100Z"
+    },
+    {
+      "id": "msg_14",
+      "userId": 7421995521,
+      "sender": "admin",
+      "type": "template",
+      "templateKey": "break_added",
+      "text": "Break added at 10:05 AM in Oklahoma City.",
+      "createdAt": "2026-03-04T07:31:22.100Z"
+    },
+    {
+      "id": "msg_15",
+      "userId": 7421995521,
+      "sender": "user",
+      "type": "text",
+      "text": "Thanks!",
+      "createdAt": "2026-03-04T07:32:22.100Z"
+    },
+    {
+      "id": "msg_16",
+      "userId": 7421995521,
+      "sender": "user",
+      "type": "request",
+      "service": "new_shift",
+      "text": "Need shift fix",
+      "createdAt": "2026-03-04T07:40:22.100Z"
+    },
+    {
+      "id": "msg_17",
+      "userId": 7421995521,
+      "sender": "admin",
+      "type": "template",
+      "templateKey": "shift_fixed",
+      "text": "Shift corrected.",
+      "createdAt": "2026-03-04T07:41:22.100Z"
+    },
+
+    {
+      "id": "msg_18",
+      "userId": 7699011442,
+      "sender": "user",
+      "type": "request",
+      "service": "new_cycle",
+      "text": "Need cycle reset",
+      "createdAt": "2026-03-04T07:35:12.100Z"
+    },
+    {
+      "id": "msg_19",
+      "userId": 7699011442,
+      "sender": "admin",
+      "type": "template",
+      "templateKey": "cycle_reset",
+      "text": "Cycle reset completed.",
+      "createdAt": "2026-03-04T07:36:12.100Z"
+    },
+    {
+      "id": "msg_20",
+      "userId": 7699011442,
+      "sender": "user",
+      "type": "text",
+      "text": "Perfect thanks",
+      "createdAt": "2026-03-04T07:37:12.100Z"
+    },
+    {
+      "id": "msg_21",
+      "userId": 7699011442,
+      "sender": "user",
+      "type": "request",
+      "service": "fix_logs",
+      "text": "Need log fix",
+      "createdAt": "2026-03-04T07:45:12.100Z"
+    },
+    {
+      "id": "msg_22",
+      "userId": 7699011442,
+      "sender": "admin",
+      "type": "template",
+      "templateKey": "logs_fixed",
+      "text": "Logs corrected.",
+      "createdAt": "2026-03-04T07:46:12.100Z"
+    },
+
+    {
+      "id": "msg_23",
+      "userId": 7310087741,
+      "sender": "user",
+      "type": "request",
+      "service": "fix_logs",
+      "text": "Fix logs please",
+      "createdAt": "2026-03-04T07:40:15.100Z"
+    },
+    {
+      "id": "msg_24",
+      "userId": 7310087741,
+      "sender": "admin",
+      "type": "text",
+      "text": "Checking now",
+      "createdAt": "2026-03-04T07:41:15.100Z"
+    },
+    {
+      "id": "msg_25",
+      "userId": 7310087741,
+      "sender": "admin",
+      "type": "template",
+      "templateKey": "logs_fixed",
+      "text": "Logs corrected.",
+      "createdAt": "2026-03-04T07:42:15.100Z"
+    },
+    {
+      "id": "msg_26",
+      "userId": 7310087741,
+      "sender": "user",
+      "type": "text",
+      "text": "Appreciate it",
+      "createdAt": "2026-03-04T07:43:15.100Z"
+    },
+    {
+      "id": "msg_27",
+      "userId": 7310087741,
+      "sender": "user",
+      "type": "request",
+      "service": "new_shift",
+      "text": "Need shift fix",
+      "createdAt": "2026-03-04T07:50:15.100Z"
+    },
+    {
+      "id": "msg_28",
+      "userId": 7310087741,
+      "sender": "admin",
+      "type": "template",
+      "templateKey": "shift_fixed",
+      "text": "Shift corrected.",
+      "createdAt": "2026-03-04T07:51:15.100Z"
+    }
+  ]
+}
