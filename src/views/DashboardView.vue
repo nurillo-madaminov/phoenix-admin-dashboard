@@ -6,11 +6,9 @@ import UserChat from "@/components/UserChat.vue";
 import { useChatStore } from "@/store/chat";
 const chatStore = useChatStore();
 
-
 onMounted(() => {
   chatStore.fetchUsers();
   chatStore.fetchMessages();
-
 
   window.addEventListener("keydown", (e) => {
     if (e.key == "Escape") {
@@ -47,7 +45,7 @@ onMounted(() => {
               </span>
             </div>
           </div>
-          <UserChat class="flex-1 w-full" />
+          <UserChat />
         </div>
         <div v-else class="h-screen flex items-center justify-center">
           <h1>Select a chat to start messaging</h1>

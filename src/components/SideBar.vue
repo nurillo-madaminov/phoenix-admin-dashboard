@@ -1,6 +1,7 @@
 <script setup>
 import { useChatStore } from "../store/chat";
 import { supabase } from "@/lib/supabase";
+import { onMounted, onUpdated } from "vue";
 import { useRouter } from "vue-router";
 
 const chatStore = useChatStore();
@@ -12,6 +13,7 @@ const logout = async () => {
   console.log("logout");
   router.push("/");
 };
+
 </script>
 
 <template>
@@ -26,8 +28,16 @@ const logout = async () => {
         v-for="user in chatStore.users"
         :key="user.telegramId"
         @click="chatStore.selectUser(user)"
+        class="relative"
       >
-        <a>{{ user.fullName }}</a>
+        <a class="relative flex items-center justify-between">
+          <span>{{ user.fullName }}</span>
+
+          <span
+            v-if="chatStore.hasUnread(user.telegramId)"
+            class="w-3 h-3 rounded-full bg-blue-400 border"
+          ></span>
+        </a>
       </li>
     </ul>
     <button class="btn btn-wide" @click="logout">Log out</button>

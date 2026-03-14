@@ -5,33 +5,88 @@ import { supabase } from "../lib/supabase";
 const chatStore = useChatStore();
 
 const message = ref("");
+const showModal = ref(false);
 
 async function sendMessage() {
+  if (message.value.length) {
+    const newMessage = {
+      user_id: chatStore.selectedUser.telegramId,
+      sender: "admin",
+      type: null,
+      text: message.value,
+    };
+
+    await supabase.from("messages").insert(newMessage);
+
+    message.value = "";
+  } else {
+    return;
+  }
+}
+
+const request = ref("");
+const location = ref("");
+const date = ref("");
+const startTime = ref("");
+const endTime = ref("");
+
+const templateMessage = ref(`
+#update
+
+📍 ${request.value} updated location:
+${location.value}
+
+📅 Date: ${date.value}
+🕙 Time: From ${startTime.value} to ${endTime.value}
+You were at this location during the time listed above.
+
+✅ BOL – No changes needed
+`);
+
+async function sendTemplate() {
   const newMessage = {
     user_id: chatStore.selectedUser.telegramId,
     sender: "admin",
     type: null,
-    text: message.value,
+    text: templateMessage._value,
   };
-
   await supabase.from("messages").insert(newMessage);
 
-  message.value = "";
+  this.showModal = false;
 }
-
-// {
-//   "id": "msg_2",
-//   "userId": 7538120752,
-//   "sender": "admin",
-//   "type": "template",
-//   "templateKey": "shift_fixed",
-//   "text": "Driver started rolling again at 14:32 in Dallas, TX.",
-//   "createdAt": "2026-03-04T07:12:45.825Z"
-// },
 </script>
 
 <template>
-  <div class="flex flex-col bg-gray-50">
+  <Teleport to="body">
+    <div
+      v-if="showModal"
+      class="absolute top-0 left-0 bg-[#00000083] w-full h-screen z-9999 flex justify-center items-center"
+      @click.self="showModal = false"
+    >
+      <div class="p-10 w-md bg-blue-500">
+        <select v-model="request" id="">
+          <option value="CYCLE">Cycle</option>
+          <option value="SHIFT">Shift</option>
+          <option value="BREAK">Break</option>
+        </select>
+        <div>
+          <label for="">Location:</label>
+          <input type="text" v-model="location" class="border" />
+        </div>
+        <div>
+          <label for="">Start time:</label>
+          <input type="text" v-model="startTime" class="border" />
+        </div>
+        <div>
+          <label for="">End time:</label>
+          <input type="text" v-model="endTime" class="border" />
+        </div>
+
+        <button @click="sendTemplate()" class="border">Send</button>
+      </div>
+    </div>
+  </Teleport>
+  <div class="flex-1 w-full flex flex-col bg-gray-50">
     <div
       class="h-[86vh] overflow-y-auto px-5 shadow-[inset_0_-6px_10px_rgba(0,0,0,0.1)] flex flex-col-reverse py-6"
     >
@@ -69,7 +124,9 @@ async function sendMessage() {
               ></path>
             </svg>
           </button>
+
           <button
+            @click="showModal = true"
             type="button"
             class="p-2 text-gray-500 rounded-lg cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600"
           >

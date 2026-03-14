@@ -53,7 +53,7 @@ export const useChatStore = defineStore("chat", {
         .from("messages")
         .select("*")
         .order("created_at", { ascending: false });
-        console.log(data)
+      console.log(data);
       if (error) {
         console.log(error);
         return;
@@ -70,17 +70,55 @@ export const useChatStore = defineStore("chat", {
             schema: "public",
             table: "messages",
           },
-          (payload) => {
-            this.messages.unshift(payload.new);
+          async (payload) => {
+            const msg = payload.new;
+
+            // add message to UI
+            this.messages.unshift(msg);
+
+            // if admin already opened that user's chat
+            if (
+              this.selectedUser &&
+              msg.user_id === this.selectedUser.telegramId &&
+              msg.sender === "user"
+            ) {
+              // update local state
+              msg.is_read = true;
+
+              // update database
+              await supabase
+                .from("messages")
+                .update({ is_read: true })
+                .eq("id", msg.id);
+            }
           },
         )
         .subscribe();
       console.log(data);
     },
 
-    selectUser(user) {
+    hasUnread(userId) {
+      return this.messages.some(
+        (m) => m.user_id === userId && m.sender === "user" && !m.is_read,
+      );
+    },
+
+    async selectUser(user) {
       this.selectedUser = user;
-      console.log(user);
+
+      // update local messages instantly
+      this.filteredMessages.forEach((element) => {
+        element.is_read = true;
+      });
+
+      this.hasUnread(this.selectUser.telegramId);
+
+      // update database
+      await supabase
+        .from("messages")
+        .update({ is_read: true })
+        .eq("user_id", user.telegramId)
+        .eq("sender", "user");
     },
   },
 });
