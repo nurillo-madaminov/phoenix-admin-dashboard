@@ -14,6 +14,17 @@ export const useChatStore = defineStore("chat", {
         (message) => message.user_id === state.selectedUser.telegramId,
       );
     },
+    sortedUsers(state) {
+      return [...state.users].sort((a, b) => {
+        const lastA = state.messages.find((m) => m.user_id === a.telegramId);
+        const lastB = state.messages.find((m) => m.user_id === b.telegramId);
+
+        const timeA = lastA ? new Date(lastA.created_at).getTime() : 0;
+        const timeB = lastB ? new Date(lastB.created_at).getTime() : 0;
+
+        return timeB - timeA;
+      });
+    },
   },
   actions: {
     async fetchUsers() {
@@ -77,20 +88,20 @@ export const useChatStore = defineStore("chat", {
             this.messages.unshift(msg);
 
             // if admin already opened that user's chat
-            if (
-              this.selectedUser &&
-              msg.user_id === this.selectedUser.telegramId &&
-              msg.sender === "user"
-            ) {
-              // update local state
-              msg.is_read = true;
+            // if (
+            //   this.selectedUser &&
+            //   msg.user_id === this.selectedUser.telegramId &&
+            //   msg.sender === "user"
+            // ) {
+            //   // update local state
+            //   msg.is_read = true;
 
-              // update database
-              await supabase
-                .from("messages")
-                .update({ is_read: true })
-                .eq("id", msg.id);
-            }
+            //   // update database
+            //   await supabase
+            //     .from("messages")
+            //     .update({ is_read: true })
+            //     .eq("id", msg.id);
+            // }
           },
         )
         .subscribe();
@@ -111,14 +122,15 @@ export const useChatStore = defineStore("chat", {
         element.is_read = true;
       });
 
-      this.hasUnread(this.selectUser.telegramId);
+      // this.hasUnread(this.selectUser.telegramId);
 
       // update database
       await supabase
         .from("messages")
         .update({ is_read: true })
         .eq("user_id", user.telegramId)
-        .eq("sender", "user");
+        .eq("sender", "user")
+        .eq("is_read", false);
     },
   },
 });

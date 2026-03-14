@@ -1,7 +1,6 @@
 <script setup>
 import { useChatStore } from "../store/chat";
 import { supabase } from "@/lib/supabase";
-import { onMounted, onUpdated } from "vue";
 import { useRouter } from "vue-router";
 
 const chatStore = useChatStore();
@@ -13,7 +12,6 @@ const logout = async () => {
   console.log("logout");
   router.push("/");
 };
-
 </script>
 
 <template>
@@ -25,7 +23,7 @@ const logout = async () => {
     <ul v-else class="menu w-[30vw]">
       <!-- Sidebar content here -->
       <li
-        v-for="user in chatStore.users"
+        v-for="user in chatStore.sortedUsers"
         :key="user.telegramId"
         @click="chatStore.selectUser(user)"
         class="relative"
