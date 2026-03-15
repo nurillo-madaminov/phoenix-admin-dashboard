@@ -24,35 +24,67 @@ async function sendMessage() {
   }
 }
 
-const request = ref("");
+const sending = ref(false);
+const service = ref("SHIFT");
 const location = ref("");
 const date = ref("");
 const startTime = ref("");
 const endTime = ref("");
+const billOfLeading = ref("");
 
-const templateMessage = ref(`
+async function sendTemplate() {
+  sending.value = true;
+  if (
+    location.value == "" ||
+    date.value == "" ||
+    startTime.value == "" ||
+    endTime.value == ""
+  ) {
+    sending.value = false;
+    alert("fill all inputs");
+    return;
+  }
+
+  const templateMessage = ref(`
 #update
 
-📍 ${request.value} updated location:
+📍 ${service.value} updated location:
 ${location.value}
 
 📅 Date: ${date.value}
 🕙 Time: From ${startTime.value} to ${endTime.value}
 You were at this location during the time listed above.
 
-✅ BOL – No changes needed
+ ${billOfLeading.value}
 `);
 
-async function sendTemplate() {
   const newMessage = {
     user_id: chatStore.selectedUser.telegramId,
     sender: "admin",
     type: null,
-    text: templateMessage._value,
+    text: templateMessage.value.trim(),
   };
   await supabase.from("messages").insert(newMessage);
 
   this.showModal = false;
+
+  service.value = "SHIFT";
+  location.value = "";
+  date.value = "";
+  startTime.value = "";
+  endTime.value = "";
+  billOfLeading.value = "";
+
+  sending.value = false;
+}
+
+function isLastInGroup(index) {
+  const current = chatStore.filteredMessages[index];
+  const prev = chatStore.filteredMessages[index - 1];
+
+  if (!prev) return true;
+
+  return current.sender !== prev.sender;
 }
 </script>
 
@@ -63,40 +95,97 @@ async function sendTemplate() {
       class="absolute top-0 left-0 bg-[#00000083] w-full h-screen z-9999 flex justify-center items-center"
       @click.self="showModal = false"
     >
-      <div class="p-10 w-md bg-blue-500">
-        <select v-model="request" id="">
-          <option value="CYCLE">Cycle</option>
-          <option value="SHIFT">Shift</option>
-          <option value="BREAK">Break</option>
-        </select>
-        <div>
-          <label for="">Location:</label>
-          <input type="text" v-model="location" class="border" />
+      <div class="bg-white w-fit p-5 rounded">
+        <div class="leading-8">
+          #update<br />
+          📍
+          <select v-model="service">
+            <option value="CYCLE">CYCLE</option>
+            <option value="SHIFT">SHIFT</option>
+            <option value="BREAK">BREAK</option>
+          </select>
+          updated location:<br />
+          <input
+            type="text"
+            class="border-b w-full leading-normal"
+            v-model="location"
+          />
+          <br />
+          📅Date:
+          <input
+            type="text"
+            class="border-b leading-normal"
+            v-model="date"
+          /><br />
+          🕙 Time: From
+          <input
+            type="text"
+            class="border-b w-30 leading-normal"
+            v-model="startTime"
+          />
+          to
+          <input
+            type="text"
+            class="border-b w-30 leading-normal"
+            v-model="endTime"
+          /><br />
+          You were at this location during the time listed above.<br />
+          <select v-model="billOfLeading">
+            <option value="">Leave here empty</option>
+            <option value="No need to change the BOL✅">
+              No need to change the BOL ✅
+            </option>
+            <option
+              value="BOL has been changed and will be send in a few minutes✅"
+            >
+              BOL has been changed and will be send in a few minutes ✅
+            </option>
+          </select>
+          <br />
+          <div class="border border-dotted rounded mt-3 px-3">
+            🔴 Please pay attention to the following:<br />
+            🔺 Make sure your profile is filled out correctly<br />
+            🔺 If you pick up a load, don’t forget to send the documents<br />
+            🔺 If an officer stops you, use the BOL we sent you<br />
+          </div>
+          🦅 Best regards, PHOENIX ELD SERVICE 🤝
         </div>
-        <div>
-          <label for="">Start time:</label>
-          <input type="text" v-model="startTime" class="border" />
-        </div>
-        <div>
-          <label for="">End time:</label>
-          <input type="text" v-model="endTime" class="border" />
-        </div>
-
-        <button @click="sendTemplate()" class="border">Send</button>
+        <button
+          @click="sendTemplate()"
+          class="btn btn-active btn-info w-full mt-5 text-white"
+        >
+          <span
+            v-if="sending"
+            class="loading loading-spinner loading-sm"
+          ></span>
+          <span v-else>Send</span>
+        </button>
       </div>
     </div>
   </Teleport>
   <div class="flex-1 w-full flex flex-col bg-gray-50">
     <div
-      class="h-[86vh] overflow-y-auto px-5 shadow-[inset_0_-6px_10px_rgba(0,0,0,0.1)] flex flex-col-reverse py-6"
+      class="h-[86vh] overflow-y-auto px-5 shadow-[inset_0_-6px_10px_rgba(0,0,0,0.1)] flex flex-col-reverse pt-6"
     >
       <div
         class="chat"
-        v-for="message in chatStore.filteredMessages"
+        v-for="(message, index) in chatStore.filteredMessages"
         :class="message.sender == 'user' ? 'chat-start' : 'chat-end'"
       >
-        <div class="chat-bubble max-w-2/3">
-          {{ message.text }}
+        <div
+          class="mb-4 chat-bubble max-w-2/3 min-w-28 relative"
+          :class="{ 'before:hidden! mb-0!': !isLastInGroup(index) }"
+        >
+          <p class="mb-1 mr-8 whitespace-pre-line">
+            {{ message.text }}
+          </p>
+          <div class="text-sm absolute bottom-1 right-2 opacity-40">
+            {{
+              String(new Date(message.created_at).getHours()).padStart(2, "0")
+            }}:{{
+              String(new Date(message.created_at).getMinutes()).padStart(2, "0")
+            }}
+          </div>
         </div>
       </div>
     </div>

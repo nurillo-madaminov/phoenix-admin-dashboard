@@ -9,6 +9,7 @@ const chatStore = useChatStore();
 onMounted(() => {
   chatStore.fetchUsers();
   chatStore.fetchMessages();
+  chatStore.fetchCompanies();
 
   window.addEventListener("keydown", (e) => {
     if (e.key == "Escape") {
@@ -32,17 +33,17 @@ onMounted(() => {
         <div v-if="chatStore.selectedUser !== null">
           <div class="navbar bg-base-300 shadow-lg z-50 px-4">
             <div class="flex flex-col">
-              <p class="text-lg font-semibold">
+              <p class="text-lg font-semibold uppercase">
                 {{ chatStore.selectedUser?.fullName }}
               </p>
-              <span class="text-sm">
+              <!-- <span class="text-sm">
                 Last active at:
                 {{
                   new Date(chatStore.selectedUser?.lastActiveAt)
                     .toTimeString()
                     .slice(0, 5)
                 }}
-              </span>
+              </span> -->
             </div>
           </div>
           <UserChat />

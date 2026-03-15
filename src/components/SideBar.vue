@@ -16,19 +16,30 @@ const logout = async () => {
 
 <template>
   <div class="p-4">
-    <h1 class="text-xl font-semibold">Drivers</h1>
-    <div v-if="chatStore.users.length <= 0" class="w-[30vw]">
+    <div>
+      <h1 class="text-xl font-semibold">Drivers</h1>
+      <div class="flex gap-2 text-neutral-400">
+        Company:
+        <select v-model="chatStore.selectedCompany">
+          <option :value="null">All</option>
+          <option :value="company.USDOT" v-for="company in chatStore.companies">
+            {{ company.name }}
+          </option>
+        </select>
+      </div>
+    </div>
+    <div v-if="chatStore.users.length <= 0">
       <h1 class="py-10 text-center">No users yet</h1>
     </div>
-    <ul v-else class="menu w-[30vw]">
+    <ul v-else class="menu">
       <!-- Sidebar content here -->
       <li
         v-for="user in chatStore.sortedUsers"
         :key="user.telegramId"
         @click="chatStore.selectUser(user)"
-        class="relative"
+        class="w-50"
       >
-        <a class="relative flex items-center justify-between">
+        <a class="relative flex items-center justify-between uppercase w-full">
           <span>{{ user.fullName }}</span>
 
           <span

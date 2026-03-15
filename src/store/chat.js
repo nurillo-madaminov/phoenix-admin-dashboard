@@ -5,6 +5,8 @@ export const useChatStore = defineStore("chat", {
   state: () => ({
     users: [],
     messages: [],
+    companies: [],
+    selectedCompany: null,
     selectedUser: null,
     loading: false,
   }),
@@ -14,8 +16,9 @@ export const useChatStore = defineStore("chat", {
         (message) => message.user_id === state.selectedUser.telegramId,
       );
     },
+
     sortedUsers(state) {
-      return [...state.users].sort((a, b) => {
+      return [...this.filteredUsersByUSDOT].sort((a, b) => {
         const lastA = state.messages.find((m) => m.user_id === a.telegramId);
         const lastB = state.messages.find((m) => m.user_id === b.telegramId);
 
@@ -24,6 +27,11 @@ export const useChatStore = defineStore("chat", {
 
         return timeB - timeA;
       });
+    },
+
+    filteredUsersByUSDOT() {
+      if (this.selectedCompany == null) return this.users;
+      return this.users.filter((user) => user.companyUSDOT == this.selectedCompany);
     },
   },
   actions: {
@@ -64,7 +72,6 @@ export const useChatStore = defineStore("chat", {
         .from("messages")
         .select("*")
         .order("created_at", { ascending: false });
-      console.log(data);
       if (error) {
         console.log(error);
         return;
@@ -105,7 +112,33 @@ export const useChatStore = defineStore("chat", {
           },
         )
         .subscribe();
+    },
+
+    async fetchCompanies() {
+      const { data, error } = await supabase.from("companies").select("*");
+      if (error) {
+        console.log(error);
+        return;
+      }
+
+      this.companies = data;
       console.log(data);
+
+      supabase
+        .channel("companies-channel")
+        .on(
+          "postgres_changes",
+          {
+            event: "INSERT",
+            schema: "public",
+            table: "companies",
+          },
+          async (payload) => {
+            const company = payload.new;
+            this.companies.unshift(company);
+          },
+        )
+        .subscribe();
     },
 
     hasUnread(userId) {
