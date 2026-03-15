@@ -66,8 +66,6 @@ You were at this location during the time listed above.
   };
   await supabase.from("messages").insert(newMessage);
 
-  this.showModal = false;
-
   service.value = "SHIFT";
   location.value = "";
   date.value = "";
@@ -76,6 +74,7 @@ You were at this location during the time listed above.
   billOfLeading.value = "";
 
   sending.value = false;
+  showModal = false;
 }
 
 function isLastInGroup(index) {
