@@ -74,7 +74,7 @@ You were at this location during the time listed above.
   billOfLeading.value = "";
 
   sending.value = false;
-  showModal = false;
+  showModal.value = false;
 }
 
 function isLastInGroup(index) {
