@@ -31,7 +31,9 @@ export const useChatStore = defineStore("chat", {
 
     filteredUsersByUSDOT() {
       if (this.selectedCompany == null) return this.users;
-      return this.users.filter((user) => user.companyUSDOT == this.selectedCompany);
+      return this.users.filter(
+        (user) => user.companyUSDOT == this.selectedCompany,
+      );
     },
   },
   actions: {
@@ -42,10 +44,6 @@ export const useChatStore = defineStore("chat", {
         console.log(error);
         return;
       }
-
-      // data.forEach((user) => {
-      //   userObj[user.telegramId] = user;
-      // });
 
       this.users = data;
 
@@ -72,6 +70,8 @@ export const useChatStore = defineStore("chat", {
         .from("messages")
         .select("*")
         .order("created_at", { ascending: false });
+
+      console.log(data);
       if (error) {
         console.log(error);
         return;
@@ -93,22 +93,6 @@ export const useChatStore = defineStore("chat", {
 
             // add message to UI
             this.messages.unshift(msg);
-
-            // if admin already opened that user's chat
-            // if (
-            //   this.selectedUser &&
-            //   msg.user_id === this.selectedUser.telegramId &&
-            //   msg.sender === "user"
-            // ) {
-            //   // update local state
-            //   msg.is_read = true;
-
-            //   // update database
-            //   await supabase
-            //     .from("messages")
-            //     .update({ is_read: true })
-            //     .eq("id", msg.id);
-            // }
           },
         )
         .subscribe();

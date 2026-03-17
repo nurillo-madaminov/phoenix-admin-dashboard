@@ -13,8 +13,18 @@ async function sendMessage() {
       user_id: chatStore.selectedUser.telegramId,
       sender: "admin",
       type: null,
-      text: message.value,
+      text: message.value.trim(),
     };
+
+    // const tempMes = {
+    //   user_id: chatStore.selectedUser.telegramId,
+    //   sender: "admin",
+    //   type: null,
+    //   text: message.value.trim(),
+    //   created_at: new Date().toISOString(),
+    // };
+
+    // chatStore.messages.push(tempMes);
 
     await supabase.from("messages").insert(newMessage);
 
@@ -31,19 +41,42 @@ const date = ref("");
 const startTime = ref("");
 const endTime = ref("");
 const billOfLeading = ref("");
+const customText = ref("");
+const isCustomText = ref(false);
 
 async function sendTemplate() {
   sending.value = true;
-  if (
-    location.value == "" ||
-    date.value == "" ||
-    startTime.value == "" ||
-    endTime.value == ""
-  ) {
-    sending.value = false;
-    alert("fill all inputs");
-    return;
+
+  if (isCustomText) {
+    if (customText == "") {
+      sending.value = false;
+      alert("Fill the textarea");
+      return;
+    }
+  } else {
+    if (
+      location.value == "" ||
+      date.value == "" ||
+      startTime.value == "" ||
+      endTime.value == ""
+    ) {
+      sending.value = false;
+      alert("fill all inputs");
+      return;
+    }
   }
+
+  const customMessage = ref(`
+  #update
+
+📍 ${service.value} updated location:
+${location.value}
+
+${customText.value}
+You were at this location during the time listed above.
+
+ ${billOfLeading.value}
+  `);
 
   const templateMessage = ref(`
 #update
@@ -62,7 +95,9 @@ You were at this location during the time listed above.
     user_id: chatStore.selectedUser.telegramId,
     sender: "admin",
     type: null,
-    text: templateMessage.value.trim(),
+    text: isCustomText.value
+      ? customMessage.value.trim()
+      : templateMessage.value.trim(),
   };
   await supabase.from("messages").insert(newMessage);
 
@@ -72,6 +107,7 @@ You were at this location during the time listed above.
   startTime.value = "";
   endTime.value = "";
   billOfLeading.value = "";
+  customText.value = "";
 
   sending.value = false;
   showModal.value = false;
@@ -96,7 +132,18 @@ function isLastInGroup(index) {
     >
       <div class="bg-white w-fit p-5 rounded">
         <div class="leading-8">
-          #update<br />
+          <div class="flex items-center justify-between">
+            <span>#update</span>
+            <div class="flex items-center gap-2 border px-2 rounded">
+              <label for="check">Custom text:</label>
+              <input
+                v-model="isCustomText"
+                type="checkbox"
+                id="check"
+                class="toggle toggle-sm"
+              />
+            </div>
+          </div>
           📍
           <select v-model="service">
             <option value="CYCLE">CYCLE</option>
@@ -110,24 +157,36 @@ function isLastInGroup(index) {
             v-model="location"
           />
           <br />
-          📅Date:
-          <input
-            type="text"
-            class="border-b leading-normal"
-            v-model="date"
-          /><br />
-          🕙 Time: From
-          <input
-            type="text"
-            class="border-b w-30 leading-normal"
-            v-model="startTime"
-          />
-          to
-          <input
-            type="text"
-            class="border-b w-30 leading-normal"
-            v-model="endTime"
-          /><br />
+          <div>
+            <div v-if="isCustomText" class="h-20 my-2">
+              <textarea
+                v-model="customText"
+                class="textarea w-full"
+                placeholder="Custom text"
+              ></textarea>
+            </div>
+            <div v-else class="h-20 my-2">
+              📅Date:
+              <input
+                type="text"
+                class="border-b leading-normal"
+                v-model="date"
+              /><br />
+              🕙 Time: From
+              <input
+                type="text"
+                class="border-b w-30 leading-normal"
+                v-model="startTime"
+              />
+              to
+              <input
+                type="text"
+                class="border-b w-30 leading-normal"
+                v-model="endTime"
+              />
+            </div>
+          </div>
+
           You were at this location during the time listed above.<br />
           <select v-model="billOfLeading">
             <option value="">Leave here empty</option>
@@ -150,7 +209,7 @@ function isLastInGroup(index) {
           🦅 Best regards, PHOENIX ELD SERVICE 🤝
         </div>
         <button
-          @click="sendTemplate()"
+          @click="sendTemplate(e)"
           class="btn btn-active btn-info w-full mt-5 text-white"
         >
           <span
@@ -164,6 +223,7 @@ function isLastInGroup(index) {
   </Teleport>
   <div class="flex-1 w-full flex flex-col bg-gray-50">
     <div
+      ref="chatContainer"
       class="h-[86vh] overflow-y-auto px-5 shadow-[inset_0_-6px_10px_rgba(0,0,0,0.1)] flex flex-col-reverse pt-6"
     >
       <div
@@ -176,7 +236,14 @@ function isLastInGroup(index) {
           :class="{ 'before:hidden! mb-0!': !isLastInGroup(index) }"
         >
           <p class="mb-1 mr-8 whitespace-pre-line">
-            {{ message.text }}
+            <a
+              v-if="message.type == 'file'"
+              class="text-blue-500"
+              :href="message.file_url"
+              target="_blank"
+              >{{ message.text }}</a
+            >
+            <span v-else>{{ message.text }}</span>
           </p>
           <div class="text-sm absolute bottom-1 right-2 opacity-40">
             {{
@@ -232,11 +299,12 @@ function isLastInGroup(index) {
             </svg>
           </button>
           <textarea
+            v-model="message"
+            @keydown.enter.prevent="sendMessage"
             id="chat"
             rows="1"
             class="block mx-4 p-2.5 w-full text-sm text-gray-900 bg-white rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             placeholder="Your message..."
-            v-model="message"
           ></textarea>
           <button
             type="button"
