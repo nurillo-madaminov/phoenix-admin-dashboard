@@ -7,6 +7,7 @@ import { supabase } from "../lib/supabase";
 import { useChatStore } from "@/store/chat";
 const chatStore = useChatStore();
 const isDragging = ref(false);
+const isUploading = ref(false);
 
 onMounted(() => {
   chatStore.fetchUsers();
@@ -34,6 +35,10 @@ function addDragListeners() {
 
   handlers.drop = async (e) => {
     e.preventDefault();
+    if (isUploading.value) return;
+
+    isUploading.value = true;
+
     const files = e.dataTransfer.files;
     const file = files[0];
     const url = await uploadFile(file);
@@ -50,6 +55,7 @@ function addDragListeners() {
     // optimistic UI
     await supabase.from("messages").insert(message);
     isDragging.value = false;
+    isUploading.value = false;
   };
 
   handlers.dragleave = () => {
@@ -81,8 +87,24 @@ watch(
   },
 );
 
+function generateSafeFileName(file) {
+  const ext = file.name.split(".").pop() || "file";
+
+  let baseName = file.name
+    .replace(/\.[^/.]+$/, "")
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9]/g, "_")
+    .replace(/_+/g, "_")
+    .replace(/^_+|_+$/g, "");
+
+  if (!baseName) baseName = "file";
+
+  return `${Date.now()}-${baseName}.${ext}`;
+}
+
 async function uploadFile(file) {
-  const fileName = `${Date.now()}-${file.name}`;
+  const fileName = generateSafeFileName(file);
 
   const { data, error } = await supabase.storage
     .from("chat-files") // your bucket
@@ -142,6 +164,7 @@ async function uploadFile(file) {
       class="absolute top-0 left-0 z-50 w-full h-screen flex items-center justify-center bg-black/50 backdrop-blur-sm"
     >
       <div
+        v-if="!isUploading"
         class="w-full max-w-xl rounded-2xl border-2 border-dashed border-white/40 bg-white p-8 shadow-2xl"
       >
         <div class="flex flex-col items-center text-center">
@@ -176,6 +199,9 @@ async function uploadFile(file) {
             </p>
           </div>
         </div>
+      </div>
+      <div v-else>
+        <span class="loading loading-spinner loading-xl"></span>
       </div>
     </div>
   </Teleport>
