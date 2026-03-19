@@ -4,6 +4,7 @@ import SideBar from "@/components/SideBar.vue";
 import UserChat from "@/components/UserChat.vue";
 import { supabase } from "../lib/supabase";
 
+import uploadFile from "../composables/uploadFile";
 import { useChatStore } from "@/store/chat";
 const chatStore = useChatStore();
 const isDragging = ref(false);
@@ -22,9 +23,11 @@ onMounted(() => {
 });
 
 let handlers = {};
+let dragCounter = 0;
 
 function addDragListeners() {
   handlers.dragenter = () => {
+    dragCounter++;
     isDragging.value = true;
   };
 
@@ -39,8 +42,7 @@ function addDragListeners() {
 
     isUploading.value = true;
 
-    const files = e.dataTransfer.files;
-    const file = files[0];
+    const file = e.dataTransfer.files[0];
     const url = await uploadFile(file);
     if (!url) return;
     const message = {
@@ -54,12 +56,17 @@ function addDragListeners() {
     };
     // optimistic UI
     await supabase.from("messages").insert(message);
+
+    dragCounter = 0;
     isDragging.value = false;
     isUploading.value = false;
   };
 
   handlers.dragleave = () => {
-    isDragging.value = false;
+    dragCounter--;
+    if (dragCounter === 0) {
+      isDragging.value = false;
+    }
   };
 
   window.addEventListener("dragenter", handlers.dragenter);
@@ -86,41 +93,6 @@ watch(
     }
   },
 );
-
-function generateSafeFileName(file) {
-  const ext = file.name.split(".").pop() || "file";
-
-  let baseName = file.name
-    .replace(/\.[^/.]+$/, "")
-    .normalize("NFKD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-zA-Z0-9]/g, "_")
-    .replace(/_+/g, "_")
-    .replace(/^_+|_+$/g, "");
-
-  if (!baseName) baseName = "file";
-
-  return `${Date.now()}-${baseName}.${ext}`;
-}
-
-async function uploadFile(file) {
-  const fileName = generateSafeFileName(file);
-
-  const { data, error } = await supabase.storage
-    .from("chat-files") // your bucket
-    .upload(fileName, file);
-
-  if (error) {
-    console.error(error);
-    return null;
-  }
-
-  const { data: publicUrl } = supabase.storage
-    .from("chat-files")
-    .getPublicUrl(fileName);
-
-  return publicUrl.publicUrl;
-}
 </script>
 
 <template>
@@ -133,7 +105,7 @@ async function uploadFile(file) {
     </div>
     <div v-else class="h-screen flex flex-1">
       <SideBar />
-      <div class="flex-1 h-full flex flex-col border-l w-[70vw] relative">
+      <div class="flex-1 h-full flex flex-col border-l w-[70vw] bg-gray-700">
         <div v-if="chatStore.selectedUser !== null">
           <div class="navbar bg-base-300 shadow-lg z-50 px-4">
             <div class="flex flex-col">

@@ -9,6 +9,8 @@ export const useChatStore = defineStore("chat", {
     selectedCompany: null,
     selectedUser: null,
     loading: false,
+    isUploading: false,
+    // file: null,
   }),
   getters: {
     filteredMessages: (state) => {

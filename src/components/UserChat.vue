@@ -2,6 +2,7 @@
 import { ref } from "vue";
 import { useChatStore } from "../store/chat";
 import { supabase } from "../lib/supabase";
+import uploadFile from "../composables/uploadFile";
 const chatStore = useChatStore();
 
 const message = ref("");
@@ -47,27 +48,27 @@ const isCustomText = ref(false);
 async function sendTemplate() {
   sending.value = true;
 
-  if (isCustomText) {
-    if (customText == "") {
+  if (isCustomText.value) {
+    if (!customText.value.trim()) {
       sending.value = false;
       alert("Fill the textarea");
       return;
     }
   } else {
     if (
-      location.value == "" ||
-      date.value == "" ||
-      startTime.value == "" ||
-      endTime.value == ""
+      !location.value.trim() ||
+      !date.value ||
+      !startTime.value ||
+      !endTime.value
     ) {
       sending.value = false;
-      alert("fill all inputs");
+      alert("Fill all inputs");
       return;
     }
   }
 
-  const customMessage = ref(`
-  #update
+  const customMessage = `
+#update
 
 📍 ${service.value} updated location:
 ${location.value}
@@ -75,10 +76,10 @@ ${location.value}
 ${customText.value}
 You were at this location during the time listed above.
 
- ${billOfLeading.value}
-  `);
+${billOfLeading.value}
+`;
 
-  const templateMessage = ref(`
+  const templateMessage = `
 #update
 
 📍 ${service.value} updated location:
@@ -88,16 +89,14 @@ ${location.value}
 🕙 Time: From ${startTime.value} to ${endTime.value}
 You were at this location during the time listed above.
 
- ${billOfLeading.value}
-`);
+${billOfLeading.value}
+`;
 
   const newMessage = {
     user_id: chatStore.selectedUser.telegramId,
     sender: "admin",
     type: null,
-    text: isCustomText.value
-      ? customMessage.value.trim()
-      : templateMessage.value.trim(),
+    text: isCustomText.value ? customMessage.trim() : templateMessage.trim(),
   };
   await supabase.from("messages").insert(newMessage);
 
@@ -121,13 +120,36 @@ function isLastInGroup(index) {
 
   return current.sender !== prev.sender;
 }
+
+const isUploading = ref(false);
+
+const handleFile = async (e) => {
+  isUploading.value = true;
+  const file = e.target.files[0];
+  const url = await uploadFile(file);
+  if (!url) return;
+
+  const message = {
+    user_id: chatStore.selectedUser.telegramId,
+    sender: "admin",
+    type: "file",
+
+    text: file.name, // display name
+    file_url: url, // actual file link
+    file_type: file.type, // 🔥 useful for UI (image/pdf/etc)
+  };
+  // optimistic UI
+  await supabase.from("messages").insert(message);
+  // console.log(e.target.files[0]);
+  isUploading.value = false;
+};
 </script>
 
 <template>
   <Teleport to="body">
     <div
       v-if="showModal"
-      class="absolute top-0 left-0 bg-[#00000083] w-full h-screen z-9999 flex justify-center items-center"
+      class="absolute top-0 left-0 bg-[#00000083] w-full h-screen z-9999 flex justify-center items-center dark:text-black"
       @click.self="showModal = false"
     >
       <div class="bg-white w-fit p-5 rounded">
@@ -161,7 +183,7 @@ function isLastInGroup(index) {
             <div v-if="isCustomText" class="h-20 my-2">
               <textarea
                 v-model="customText"
-                class="textarea w-full"
+                class="textarea w-full dark:bg-white dark:border-gray-300"
                 placeholder="Custom text"
               ></textarea>
             </div>
@@ -221,7 +243,7 @@ function isLastInGroup(index) {
       </div>
     </div>
   </Teleport>
-  <div class="flex-1 w-full flex flex-col bg-gray-50">
+  <div class="flex-1 w-full flex flex-col">
     <div
       ref="chatContainer"
       class="h-[86vh] overflow-y-auto px-5 shadow-[inset_0_-6px_10px_rgba(0,0,0,0.1)] flex flex-col-reverse pt-6"
@@ -262,23 +284,37 @@ function isLastInGroup(index) {
         <div
           class="flex items-center rounded-lg py-2 px-3 bg-gray-50 dark:bg-gray-700"
         >
-          <button
-            type="button"
-            class="inline-flex justify-center p-2 text-gray-500 rounded-lg cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600"
-          >
-            <svg
-              class="w-6 h-6"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                fill-rule="evenodd"
-                d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
-                clip-rule="evenodd"
-              ></path>
-            </svg>
-          </button>
+          <div>
+            <div v-if="!isUploading">
+              <label
+                for="file"
+                type="button"
+                class="inline-flex justify-center p-2 text-gray-500 rounded-lg cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600"
+              >
+                <svg
+                  class="w-6 h-6"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
+                    clip-rule="evenodd"
+                  ></path>
+                </svg>
+              </label>
+              <input
+                type="file"
+                id="file"
+                class="hidden"
+                @change="handleFile"
+              />
+            </div>
+            <div v-else class="px-2.5">
+              <span class="loading loading-spinner loading-sm"></span>
+            </div>
+          </div>
 
           <button
             @click="showModal = true"
