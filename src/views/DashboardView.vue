@@ -106,7 +106,7 @@ watch(
     <div v-else class="h-screen flex flex-1">
       <SideBar />
       <div
-        class="flex-1 h-full flex flex-col border-l w-[70vw] dark:bg-gray-700"
+        class="flex-1 h-full flex flex-col border-l w-[70vw] bg-gray-50 dark:bg-gray-700"
       >
         <div v-if="chatStore.selectedUser !== null">
           <div class="navbar bg-base-300 shadow-lg z-50 px-4">
