@@ -193,7 +193,7 @@ function handleScroll() {
     <div
       @scroll="handleScroll()"
       ref="chatContainer"
-      class="h-[86vh] overflow-y-auto px-5 shadow-[inset_0_-6px_10px_rgba(0,0,0,0.1)] flex flex-col-reverse pt-6"
+      class="h-[86vh] overflow-y-auto px-5 shadow-[inset_0_-6px_10px_rgba(0,0,0,0.1)] flex flex-col-reverse pt-4"
     >
       <div
         v-if="!chatStore.loadingMessages"
@@ -204,7 +204,7 @@ function handleScroll() {
         <!-- DATE SEPARATOR -->
         <div
           v-if="isNewDate(index)"
-          class="flex items-center my-2 gap-3 self-center"
+          class="flex items-center my-5 gap-3 self-center"
         >
           <div
             class="px-3 py-0.5 text-sm font-medium text-gray-500 bg-white shadow-sm rounded-full border border-gray-200"
