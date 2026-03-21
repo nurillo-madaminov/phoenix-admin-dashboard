@@ -6,4 +6,4 @@ import "./style.css";
 import router from "@/router";
 
 createApp(App).use(router).use(createPinia()).mount("#app");
-injectSpeedInsights();
+// injectSpeedInsights();

@@ -146,103 +146,6 @@ const handleFile = async (e) => {
 </script>
 
 <template>
-  <Teleport to="body">
-    <div
-      v-if="showModal"
-      class="absolute top-0 left-0 bg-[#00000083] w-full h-screen z-9999 flex justify-center items-center dark:text-black"
-      @click.self="showModal = false"
-    >
-      <div class="bg-white w-fit p-5 rounded">
-        <div class="leading-8">
-          <div class="flex items-center justify-between">
-            <span>#update</span>
-            <div class="flex items-center gap-2 border px-2 rounded">
-              <label for="check">Custom text:</label>
-              <input
-                v-model="isCustomText"
-                type="checkbox"
-                id="check"
-                class="toggle toggle-sm"
-              />
-            </div>
-          </div>
-          📍
-          <select v-model="service">
-            <option value="CYCLE">CYCLE</option>
-            <option value="SHIFT">SHIFT</option>
-            <option value="BREAK">BREAK</option>
-          </select>
-          updated location:<br />
-          <input
-            type="text"
-            class="border-b w-full leading-normal"
-            v-model="location"
-          />
-          <br />
-          <div>
-            <div v-if="isCustomText" class="h-20 my-2">
-              <textarea
-                v-model="customText"
-                class="textarea w-full dark:bg-white dark:border-gray-300"
-                placeholder="Custom text"
-              ></textarea>
-            </div>
-            <div v-else class="h-20 my-2">
-              📅Date:
-              <input
-                type="text"
-                class="border-b leading-normal"
-                v-model="date"
-              /><br />
-              🕙 Time: From
-              <input
-                type="text"
-                class="border-b w-30 leading-normal"
-                v-model="startTime"
-              />
-              to
-              <input
-                type="text"
-                class="border-b w-30 leading-normal"
-                v-model="endTime"
-              />
-            </div>
-          </div>
-
-          You were at this location during the time listed above.<br />
-          <select v-model="billOfLeading">
-            <option value="">Leave here empty</option>
-            <option value="No need to change the BOL✅">
-              No need to change the BOL ✅
-            </option>
-            <option
-              value="BOL has been changed and will be send in a few minutes✅"
-            >
-              BOL has been changed and will be send in a few minutes ✅
-            </option>
-          </select>
-          <br />
-          <div class="border border-dotted rounded mt-3 px-3">
-            🔴 Please pay attention to the following:<br />
-            🔺 Make sure your profile is filled out correctly<br />
-            🔺 If you pick up a load, don’t forget to send the documents<br />
-            🔺 If an officer stops you, use the BOL we sent you<br />
-          </div>
-          🦅 Best regards, PHOENIX ELD SERVICE 🤝
-        </div>
-        <button
-          @click="sendTemplate(e)"
-          class="btn btn-active btn-info w-full mt-5 text-white"
-        >
-          <span
-            v-if="sending"
-            class="loading loading-spinner loading-sm"
-          ></span>
-          <span v-else>Send</span>
-        </button>
-      </div>
-    </div>
-  </Teleport>
   <div class="flex-1 w-full flex flex-col">
     <div
       ref="chatContainer"
@@ -362,4 +265,102 @@ const handleFile = async (e) => {
       </form>
     </div>
   </div>
+  <Teleport to="body">
+    <div
+      @keydown.enter="sendTemplate"
+      v-if="showModal"
+      class="absolute top-0 left-0 bg-[#00000083] w-full h-screen z-9999 flex justify-center items-center dark:text-black"
+      @click.self="showModal = false"
+    >
+      <div class="bg-white w-fit p-5 rounded">
+        <div class="leading-8">
+          <div class="flex items-center justify-between">
+            <span>#update</span>
+            <div class="flex items-center gap-2 border px-2 rounded">
+              <label for="check">Custom text:</label>
+              <input
+                v-model="isCustomText"
+                type="checkbox"
+                id="check"
+                class="toggle toggle-sm"
+              />
+            </div>
+          </div>
+          📍
+          <select v-model="service">
+            <option value="CYCLE">CYCLE</option>
+            <option value="SHIFT">SHIFT</option>
+            <option value="BREAK">BREAK</option>
+          </select>
+          updated location:<br />
+          <input
+            type="text"
+            class="border-b w-full leading-normal"
+            v-model="location"
+          />
+          <br />
+          <div>
+            <div v-if="isCustomText" class="h-20 my-2">
+              <textarea
+                v-model="customText"
+                class="textarea w-full dark:bg-white dark:border-gray-300"
+                placeholder="Custom text"
+              ></textarea>
+            </div>
+            <div v-else class="h-20 my-2">
+              📅Date:
+              <input
+                type="text"
+                class="border-b leading-normal"
+                v-model="date"
+              /><br />
+              🕙 Time: From
+              <input
+                type="text"
+                class="border-b w-30 leading-normal"
+                v-model="startTime"
+              />
+              to
+              <input
+                type="text"
+                class="border-b w-30 leading-normal"
+                v-model="endTime"
+              />
+            </div>
+          </div>
+
+          You were at this location during the time listed above.<br />
+          <select v-model="billOfLeading">
+            <option value="">Leave here empty</option>
+            <option value="No need to change the BOL✅">
+              No need to change the BOL ✅
+            </option>
+            <option
+              value="BOL has been changed and will be send in a few minutes✅"
+            >
+              BOL has been changed and will be send in a few minutes ✅
+            </option>
+          </select>
+          <br />
+          <div class="border border-dotted rounded mt-3 px-3">
+            🔴 Please pay attention to the following:<br />
+            🔺 Make sure your profile is filled out correctly<br />
+            🔺 If you pick up a load, don’t forget to send the documents<br />
+            🔺 If an officer stops you, use the BOL we sent you<br />
+          </div>
+          🦅 Best regards, PHOENIX ELD SERVICE 🤝
+        </div>
+        <button
+          @click="sendTemplate(e)"
+          class="btn btn-active btn-info w-full mt-5 text-white"
+        >
+          <span
+            v-if="sending"
+            class="loading loading-spinner loading-sm"
+          ></span>
+          <span v-else>Send</span>
+        </button>
+      </div>
+    </div>
+  </Teleport>
 </template>
