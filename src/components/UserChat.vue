@@ -143,19 +143,79 @@ const handleFile = async (e) => {
   // console.log(e.target.files[0]);
   isUploading.value = false;
 };
+
+function isNewDate(index) {
+  const messages = chatStore.filteredMessages;
+
+  if (index === messages.length - 1) return true; // first message (because flex-col-reverse)
+
+  const current = new Date(messages[index].created_at);
+  const prev = new Date(messages[index + 1].created_at);
+
+  return current.toDateString() !== prev.toDateString();
+}
+
+function formatDate(date) {
+  const d = new Date(date);
+
+  const today = new Date();
+  const yesterday = new Date();
+  yesterday.setDate(today.getDate() - 1);
+
+  const dStr = d.toDateString();
+  const todayStr = today.toDateString();
+  const yesterdayStr = yesterday.toDateString();
+
+  if (dStr === todayStr) return "Today";
+  if (dStr === yesterdayStr) return "Yesterday";
+
+  return d.toLocaleDateString(undefined, {
+    day: "numeric",
+    month: "long",
+  });
+}
+
+const chatContainer = ref(null);
+function handleScroll() {
+  const el = chatContainer.value;
+
+  const threshold = 50;
+
+  if (Math.abs(el.scrollTop) > el.scrollHeight - el.clientHeight - threshold) {
+    // console.log("LOAD MORE");
+    chatStore.fetchMoreMessages();
+  }
+}
 </script>
 
 <template>
   <div class="flex-1 w-full flex flex-col">
     <div
+      @scroll="handleScroll()"
       ref="chatContainer"
       class="h-[86vh] overflow-y-auto px-5 shadow-[inset_0_-6px_10px_rgba(0,0,0,0.1)] flex flex-col-reverse pt-6"
     >
       <div
-        class="chat"
+        v-if="!chatStore.loadingMessages"
+        class="chat flex flex-col"
         v-for="(message, index) in chatStore.filteredMessages"
         :class="message.sender == 'user' ? 'chat-start' : 'chat-end'"
       >
+        <!-- DATE SEPARATOR -->
+        <div
+          v-if="isNewDate(index)"
+          class="flex items-center my-2 gap-3 self-center"
+        >
+          <div
+            class="px-3 py-0.5 text-sm font-medium text-gray-500 bg-white shadow-sm rounded-full border border-gray-200"
+          >
+            {{ formatDate(message.created_at) }}
+          </div>
+
+          <div class="flex-1 h-px bg-gray-300/60"></div>
+        </div>
+
+        <!-- MESSAGE -->
         <div
           class="mb-4 chat-bubble max-w-2/3 min-w-28 relative"
           :class="{ 'before:hidden! mb-0!': !isLastInGroup(index) }"
@@ -178,6 +238,9 @@ const handleFile = async (e) => {
             }}
           </div>
         </div>
+      </div>
+      <div v-else class="w-full h-[86vh] flex items-center justify-center">
+        <span class="loading loading-dots loading-lg text-neutral-400"></span>
       </div>
     </div>
 

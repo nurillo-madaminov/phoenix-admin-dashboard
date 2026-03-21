@@ -12,7 +12,7 @@ const isUploading = ref(false);
 
 onMounted(() => {
   chatStore.fetchUsers();
-  chatStore.fetchMessages();
+  // chatStore.fetchMessages();
   chatStore.fetchCompanies();
 
   window.addEventListener("keydown", (e) => {
