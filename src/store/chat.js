@@ -71,14 +71,14 @@ export const useChatStore = defineStore("chat", {
     },
 
     async fetchMessages() {
-      const LIMIT = 20;
+      // const LIMIT = 20;
       this.loadingMessages = true;
       const { data, error } = await supabase
         .from("messages")
         .select("*")
-        .eq("user_id", this.selectedUser.telegramId)
-        .order("created_at", { ascending: false })
-        .limit(LIMIT);
+        .order("created_at", { ascending: false });
+        // .eq("user_id", this.selectedUser.telegramId)
+        // .limit(LIMIT);
 
       // console.log(data);
       if (error) {
