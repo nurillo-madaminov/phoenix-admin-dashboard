@@ -12,14 +12,55 @@ const logout = async () => {
   console.log("logout");
   router.push("/");
 };
+
+// const searchFor = ref('')
 </script>
 
 <template>
   <div class="p-4">
-    <div>
-      <h1 class="text-xl font-semibold">Drivers</h1>
+    <div class="border-b border-neutral-200 pb-2">
+      <h1 class="text-2xl font-semibold mb-2">Phoenix ELD Serice</h1>
+      <div class="relative">
+        <label class="input p-1 h-8 mb-2">
+          <svg
+            class="h-[1em] opacity-50"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+          >
+            <g
+              stroke-linejoin="round"
+              stroke-linecap="round"
+              stroke-width="2.5"
+              fill="none"
+              stroke="currentColor"
+            >
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.3-4.3"></path>
+            </g>
+          </svg>
+          <input
+            v-model="chatStore.searchFor"
+            type="Search for drivers"
+            required
+            placeholder="Search"
+          />
+        </label>
+
+        <ul class="list bg-base-100 rounded-box shadow-md absolute z-10 w-full">
+          <li
+            class="list-row"
+            v-for="user in chatStore.searchUser"
+            @click="
+              chatStore.selectedUser = user;
+              chatStore.searchFor = '';
+            "
+          >
+            {{ user.fullName }}
+          </li>
+        </ul>
+      </div>
       <div class="flex gap-2 text-neutral-400">
-        Company:
+        <span class="text-sm whitespace-nowrap">Company:</span>
         <select v-model="chatStore.selectedCompany">
           <option :value="null">All</option>
           <option :value="company.USDOT" v-for="company in chatStore.companies">

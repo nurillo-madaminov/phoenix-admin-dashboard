@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { supabase } from "../lib/supabase.js";
+import notification from "../assets/sounds/notification.mp3";
 
 export const useChatStore = defineStore("chat", {
   state: () => ({
@@ -10,6 +11,7 @@ export const useChatStore = defineStore("chat", {
     selectedUser: null,
     loading: false,
     isUploading: false,
+    searchFor: "",
     // lastMessageDate: null, // 👈 no cursor yet
     // hasMore: true, // 👈 assume there are more messages
     // loadingMessages: false,
@@ -39,6 +41,19 @@ export const useChatStore = defineStore("chat", {
       return this.users.filter(
         (user) => user.companyUSDOT == this.selectedCompany,
       );
+    },
+
+    searchUser() {
+      const q = this.searchFor.toLowerCase().trim();
+      if (!q) return;
+
+      return this.users.filter((user) => {
+        return (
+          user.fullName?.toLowerCase().includes(q) ||
+          user.phone?.includes(q) ||
+          user.companyUSDOT?.toString().includes(q)
+        );
+      });
     },
   },
   actions: {
@@ -105,6 +120,8 @@ export const useChatStore = defineStore("chat", {
 
             // add message to UI
             this.messages.unshift(msg);
+            const audio = new Audio(notification);
+            audio.play();
           },
         )
         .subscribe();
