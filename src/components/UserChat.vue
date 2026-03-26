@@ -175,28 +175,25 @@ function formatDate(date) {
   });
 }
 
-const chatContainer = ref(null);
-function handleScroll() {
-  const el = chatContainer.value;
+// const chatContainer = ref(null);
+// function handleScroll() {
+//   const el = chatContainer.value;
 
-  const threshold = 50;
+//   const threshold = 50;
 
-  if (Math.abs(el.scrollTop) > el.scrollHeight - el.clientHeight - threshold) {
-    // console.log("LOAD MORE");
-    chatStore.fetchMoreMessages();
-  }
-}
+//   if (Math.abs(el.scrollTop) > el.scrollHeight - el.clientHeight - threshold) {
+//     // console.log("LOAD MORE");
+//     chatStore.fetchMoreMessages();
+//   }
+// }
 </script>
 
 <template>
   <div class="flex-1 w-full flex flex-col">
     <div
-      @scroll="handleScroll()"
-      ref="chatContainer"
       class="h-[86vh] overflow-y-auto px-5 shadow-[inset_0_-6px_10px_rgba(0,0,0,0.1)] flex flex-col-reverse pt-4"
     >
       <div
-        v-if="!chatStore.loadingMessages"
         class="chat flex flex-col"
         v-for="(message, index) in chatStore.filteredMessages"
         :class="message.sender == 'user' ? 'chat-start' : 'chat-end'"
@@ -239,9 +236,9 @@ function handleScroll() {
           </div>
         </div>
       </div>
-      <div v-else class="w-full h-[86vh] flex items-center justify-center">
+      <!-- <div v-else class="w-full h-[86vh] flex items-center justify-center">
         <span class="loading loading-dots loading-lg text-neutral-400"></span>
-      </div>
+      </div> -->
     </div>
 
     <div class="max-w-2xl w-full mx-auto">

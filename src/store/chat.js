@@ -10,10 +10,10 @@ export const useChatStore = defineStore("chat", {
     selectedUser: null,
     loading: false,
     isUploading: false,
-    lastMessageDate: null, // 👈 no cursor yet
-    hasMore: true, // 👈 assume there are more messages
-    loadingMessages: false,
-    loadingMoreMessages: false,
+    // lastMessageDate: null, // 👈 no cursor yet
+    // hasMore: true, // 👈 assume there are more messages
+    // loadingMessages: false,
+    // loadingMoreMessages: false,
   }),
   getters: {
     filteredMessages: (state) => {
@@ -71,14 +71,11 @@ export const useChatStore = defineStore("chat", {
     },
 
     async fetchMessages() {
-      // const LIMIT = 20;
-      this.loadingMessages = true;
+      this.loading = true;
       const { data, error } = await supabase
         .from("messages")
         .select("*")
         .order("created_at", { ascending: false });
-        // .eq("user_id", this.selectedUser.telegramId)
-        // .limit(LIMIT);
 
       // console.log(data);
       if (error) {
@@ -87,12 +84,12 @@ export const useChatStore = defineStore("chat", {
       }
 
       this.messages = data;
-      this.loadingMessages = false;
+      this.loading = false;
 
       // 👇 remember the oldest message you got
-      this.lastMessageDate = data[data.length - 1]?.created_at;
+      // this.lastMessageDate = data[data.length - 1]?.created_at;
 
-      this.hasMore = data.length === LIMIT;
+      // this.hasMore = data.length === LIMIT;
 
       supabase
         .channel("messages-channel")
@@ -113,37 +110,37 @@ export const useChatStore = defineStore("chat", {
         .subscribe();
     },
 
-    async fetchMoreMessages() {
-      if (!this.hasMore || this.loadingMoreMessages) return;
+    // async fetchMoreMessages() {
+    //   if (!this.hasMore || this.loadingMoreMessages) return;
 
-      this.loadingMoreMessages = true;
-      const LIMIT = 20;
+    //   this.loadingMoreMessages = true;
+    //   const LIMIT = 20;
 
-      const { data, error } = await supabase
-        .from("messages")
-        .select("*")
-        .eq("user_id", this.selectedUser.telegramId)
-        .lt("created_at", this.lastMessageDate) // 👈 KEY
-        .order("created_at", { ascending: false })
-        .limit(LIMIT);
+    //   const { data, error } = await supabase
+    //     .from("messages")
+    //     .select("*")
+    //     .eq("user_id", this.selectedUser.telegramId)
+    //     .lt("created_at", this.lastMessageDate) // 👈 KEY
+    //     .order("created_at", { ascending: false })
+    //     .limit(LIMIT);
 
-      if (error) {
-        console.log(error);
-        this.loadingMoreMessages = false;
-        return;
-      }
+    //   if (error) {
+    //     console.log(error);
+    //     this.loadingMoreMessages = false;
+    //     return;
+    //   }
 
-      this.messages.push(...data); // 👈 append older messages
+    //   this.messages.push(...data); // 👈 append older messages
 
-      // update cursor
-      this.lastMessageDate = data[data.length - 1]?.created_at;
+    //   // update cursor
+    //   this.lastMessageDate = data[data.length - 1]?.created_at;
 
-      if (data.length < LIMIT) {
-        this.hasMore = false;
-      }
+    //   if (data.length < LIMIT) {
+    //     this.hasMore = false;
+    //   }
 
-      this.loadingMoreMessages = false;
-    },
+    //   this.loadingMoreMessages = false;
+    // },
 
     async fetchCompanies() {
       const { data, error } = await supabase.from("companies").select("*");
@@ -186,8 +183,6 @@ export const useChatStore = defineStore("chat", {
         element.is_read = true;
       });
 
-      // this.hasUnread(this.selectUser.telegramId);
-
       // update database
       await supabase
         .from("messages")
@@ -195,8 +190,6 @@ export const useChatStore = defineStore("chat", {
         .eq("user_id", user.telegramId)
         .eq("sender", "user")
         .eq("is_read", false);
-
-      await this.fetchMessages();
     },
   },
 });

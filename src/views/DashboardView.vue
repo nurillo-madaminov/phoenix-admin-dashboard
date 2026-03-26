@@ -12,7 +12,7 @@ const isUploading = ref(false);
 
 onMounted(() => {
   chatStore.fetchUsers();
-  // chatStore.fetchMessages();
+  chatStore.fetchMessages();
   chatStore.fetchCompanies();
 
   window.addEventListener("keydown", (e) => {
@@ -114,14 +114,19 @@ watch(
               <p class="text-lg font-semibold uppercase">
                 {{ chatStore.selectedUser?.fullName }}
               </p>
-              <!-- <span class="text-sm">
-                Last active at:
-                {{
-                  new Date(chatStore.selectedUser?.lastActiveAt)
-                    .toTimeString()
-                    .slice(0, 5)
-                }}
+              <!-- <span class="text-sm text-neutral-500">
+                Company:
+                {{ chatStore.selectedUser?.companyUSDOT }}
               </span> -->
+              <span class="text-sm text-neutral-500">
+                Company:
+                {{
+                  chatStore.companies.find(
+                    (i) => i.USDOT == chatStore.selectedUser?.companyUSDOT,
+                  )?.name
+                }}
+                {{ chatStore.selectedUser?.companyUSDOT }}
+              </span>
             </div>
           </div>
           <UserChat />
