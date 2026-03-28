@@ -7,8 +7,13 @@ const chatStore = useChatStore();
 
 const message = ref("");
 const showModal = ref(false);
+const sendingMessage = ref(false);
 
 async function sendMessage() {
+  if (sendingMessage.value == true) return;
+
+  sendingMessage.value = true;
+
   if (message.value.length) {
     const newMessage = {
       user_id: chatStore.selectedUser.telegramId,
@@ -30,6 +35,7 @@ async function sendMessage() {
     await supabase.from("messages").insert(newMessage);
 
     message.value = "";
+    sendingMessage.value = false;
   } else {
     return;
   }
@@ -175,17 +181,6 @@ function formatDate(date) {
   });
 }
 
-// const chatContainer = ref(null);
-// function handleScroll() {
-//   const el = chatContainer.value;
-
-//   const threshold = 50;
-
-//   if (Math.abs(el.scrollTop) > el.scrollHeight - el.clientHeight - threshold) {
-//     // console.log("LOAD MORE");
-//     chatStore.fetchMoreMessages();
-//   }
-// }
 </script>
 
 <template>

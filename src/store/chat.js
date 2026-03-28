@@ -120,8 +120,10 @@ export const useChatStore = defineStore("chat", {
 
             // add message to UI
             this.messages.unshift(msg);
-            const audio = new Audio(notification);
-            audio.play();
+            if (msg.sender == "user") {
+              const audio = new Audio(notification);
+              audio.play();
+            }
           },
         )
         .subscribe();
