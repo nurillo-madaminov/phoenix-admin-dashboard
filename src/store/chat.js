@@ -87,10 +87,11 @@ export const useChatStore = defineStore("chat", {
 
     async fetchMessages() {
       this.loading = true;
-      const { data, error } = await supabase
-        .from("messages")
-        .select("*")
-        .order("created_at", { ascending: false });
+      const {data, error} = await supabase.rpc('get_last_20_admin_user_messages') 
+      // const { data, error } = await supabase
+      //   .from("messages")
+      //   .select("*")
+      //   .order("created_at", { ascending: false });
 
       // console.log(data);
       if (error) {

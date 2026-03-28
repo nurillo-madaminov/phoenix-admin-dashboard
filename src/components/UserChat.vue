@@ -133,7 +133,11 @@ const handleFile = async (e) => {
   isUploading.value = true;
   const file = e.target.files[0];
   const url = await uploadFile(file);
-  if (!url) return;
+  if (!url || !file.type.includes("pdf")) {
+    isUploading.value = false;
+    alert('Plase Upload PDF')
+    return;
+  }
 
   const message = {
     user_id: chatStore.selectedUser.telegramId,
@@ -180,7 +184,6 @@ function formatDate(date) {
     month: "long",
   });
 }
-
 </script>
 
 <template>

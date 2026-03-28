@@ -44,22 +44,31 @@ function addDragListeners() {
 
     const file = e.dataTransfer.files[0];
     const url = await uploadFile(file);
-    if (!url) return;
-    const message = {
-      user_id: chatStore.selectedUser.telegramId,
-      sender: "admin",
-      type: "file",
 
-      text: file.name, // display name
-      file_url: url, // actual file link
-      file_type: file.type, // 🔥 useful for UI (image/pdf/etc)
-    };
-    // optimistic UI
-    await supabase.from("messages").insert(message);
+    if (!url || !file.type.includes("pdf")) {
+      dragCounter = 0;
+      isDragging.value = false;
+      isUploading.value = false;
+      setTimeout(() => {
+        alert("Please Upload PDF");
+      }, 10);
+    } else {
+      const message = {
+        user_id: chatStore.selectedUser.telegramId,
+        sender: "admin",
+        type: "file",
 
-    dragCounter = 0;
-    isDragging.value = false;
-    isUploading.value = false;
+        text: file.name, // display name
+        file_url: url, // actual file link
+        file_type: file.type, // 🔥 useful for UI (image/pdf/etc)
+      };
+      // optimistic UI
+      await supabase.from("messages").insert(message);
+
+      dragCounter = 0;
+      isDragging.value = false;
+      isUploading.value = false;
+    }
   };
 
   handlers.dragleave = () => {

@@ -17,6 +17,7 @@ function generateSafeFileName(file) {
 }
 
 export default async function uploadFile(file) {
+  if (!file.type.includes("pdf")) return;
   const fileName = generateSafeFileName(file);
 
   const { data, error } = await supabase.storage
