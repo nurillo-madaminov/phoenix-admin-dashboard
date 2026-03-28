@@ -215,7 +215,7 @@ function formatDate(date) {
           class="mb-4 chat-bubble max-w-2/3 min-w-28 relative"
           :class="{ 'before:hidden! mb-0!': !isLastInGroup(index) }"
         >
-          <p class="mb-1 mr-8 whitespace-pre-line break-words">
+          <p class="mb-1 mr-8 whitespace-pre-line wrap-break-word">
             <a
               v-if="message.type == 'file'"
               class="text-blue-500"
