@@ -11,10 +11,13 @@ const isDragging = ref(false);
 const isUploading = ref(false);
 
 onMounted(() => {
-  chatStore.fetchUsers();
-  chatStore.fetchMessages();
+  setInterval(() => {
+    chatStore.fetchUsers();
+    chatStore.fetchMessages();
+  }, 5000)
+  
   chatStore.fetchCompanies();
-
+  
   window.addEventListener("keydown", (e) => {
     if (e.key == "Escape") {
       chatStore.selectedUser = null;
