@@ -11,11 +11,8 @@ const isDragging = ref(false);
 const isUploading = ref(false);
 
 onMounted(() => {
-  setInterval(() => {
-    chatStore.fetchUsers();
-    chatStore.fetchMessages();
-  }, 5000)
-  
+  chatStore.fetchUsers();
+  chatStore.fetchMessages();  
   chatStore.fetchCompanies();
   
   window.addEventListener("keydown", (e) => {
