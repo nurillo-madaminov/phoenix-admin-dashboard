@@ -2,6 +2,8 @@ import { defineStore } from "pinia";
 import { supabase } from "../lib/supabase.js";
 import notification from "../assets/sounds/notification.mp3";
 
+const DEBUG = import.meta.env.VITE_DEBUG_REALTIME === 'true'
+
 export const useChatStore = defineStore("chat", {
   state: () => ({
     users: [],
@@ -12,6 +14,12 @@ export const useChatStore = defineStore("chat", {
     loading: false,
     isUploading: false,
     searchFor: "",
+    // Channel references for cleanup
+    channels: {
+      users: null,
+      messages: null,
+      companies: null,
+    },
     // lastMessageDate: null, // 👈 no cursor yet
     // hasMore: true, // 👈 assume there are more messages
     // loadingMessages: false,
@@ -57,17 +65,66 @@ export const useChatStore = defineStore("chat", {
     },
   },
   actions: {
+    // Initialize visibility change listener for reconnection
+    initVisibilityListener() {
+      if (typeof document === 'undefined') return
+
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+          if (DEBUG) {
+            console.log('[ChatStore] Tab became visible, checking subscriptions...')
+          }
+          // Reconnect all channels when tab becomes visible
+          this.reconnectAllChannels()
+        }
+      })
+    },
+
+    // Reconnect all channels - useful after tab becomes visible
+    reconnectAllChannels() {
+      Object.keys(this.channels).forEach((channelName) => {
+        const channel = this.channels[channelName]
+        if (channel) {
+          const state = channel.state
+          if (DEBUG) {
+            console.log(`[ChatStore] Channel ${channelName} state: ${state}`)
+          }
+          if (state !== 'joined') {
+            if (DEBUG) {
+              console.log(`[ChatStore] Reconnecting ${channelName} channel...`)
+            }
+            channel.subscribe()
+          }
+        }
+      })
+    },
+
+    // Cleanup a specific channel before creating a new one
+    cleanupChannel(channelName) {
+      const existingChannel = this.channels[channelName]
+      if (existingChannel) {
+        if (DEBUG) {
+          console.log(`[ChatStore] Cleaning up existing ${channelName} channel`)
+        }
+        supabase.removeChannel(existingChannel)
+        this.channels[channelName] = null
+      }
+    },
+
     async fetchUsers() {
       this.loading = true;
       const { data, error } = await supabase.from("users").select("*");
       if (error) {
-        console.log(error);
+        console.error("[ChatStore] Error fetching users:", error);
         return;
       }
 
       this.users = data;
 
-      supabase
+      // Cleanup existing channel before creating new one
+      this.cleanupChannel('users')
+
+      this.channels.users = supabase
         .channel("users-channel")
         .on(
           "postgres_changes",
@@ -77,10 +134,17 @@ export const useChatStore = defineStore("chat", {
             table: "users",
           },
           (payload) => {
+            if (DEBUG) {
+              console.log('[ChatStore] New user received:', payload.new)
+            }
             this.users.unshift(payload.new);
           },
         )
-        .subscribe();
+        .subscribe((status) => {
+          if (DEBUG) {
+            console.log(`[ChatStore] Users channel status: ${status}`)
+          }
+        })
 
       this.loading = false;
     },
@@ -95,7 +159,7 @@ export const useChatStore = defineStore("chat", {
 
       // console.log(data);
       if (error) {
-        console.log(error);
+        console.error("[ChatStore] Error fetching messages:", error);
         return;
       }
 
@@ -107,7 +171,10 @@ export const useChatStore = defineStore("chat", {
 
       // this.hasMore = data.length === LIMIT;
 
-      supabase
+      // Cleanup existing channel before creating new one
+      this.cleanupChannel('messages')
+
+      this.channels.messages = supabase
         .channel("messages-channel")
         .on(
           "postgres_changes",
@@ -119,6 +186,10 @@ export const useChatStore = defineStore("chat", {
           async (payload) => {
             const msg = payload.new;
 
+            if (DEBUG) {
+              console.log('[ChatStore] New message received:', msg)
+            }
+
             // add message to UI
             this.messages.unshift(msg);
             if(msg.sender == "user") {
@@ -127,7 +198,11 @@ export const useChatStore = defineStore("chat", {
             };
           },
         )
-        .subscribe();
+        .subscribe((status) => {
+          if (DEBUG) {
+            console.log(`[ChatStore] Messages channel status: ${status}`)
+          }
+        })
     },
 
     // async fetchMoreMessages() {
@@ -157,7 +232,7 @@ export const useChatStore = defineStore("chat", {
 
     //   if (data.length < LIMIT) {
     //     this.hasMore = false;
-    //   }
+      //   }
 
     //   this.loadingMoreMessages = false;
     // },
@@ -165,14 +240,17 @@ export const useChatStore = defineStore("chat", {
     async fetchCompanies() {
       const { data, error } = await supabase.from("companies").select("*");
       if (error) {
-        console.log(error);
+        console.error("[ChatStore] Error fetching companies:", error);
         return;
       }
 
       this.companies = data;
       // console.log(data);
 
-      supabase
+      // Cleanup existing channel before creating new one
+      this.cleanupChannel('companies')
+
+      this.channels.companies = supabase
         .channel("companies-channel")
         .on(
           "postgres_changes",
@@ -183,10 +261,17 @@ export const useChatStore = defineStore("chat", {
           },
           async (payload) => {
             const company = payload.new;
+            if (DEBUG) {
+              console.log('[ChatStore] New company received:', company)
+            }
             this.companies.unshift(company);
           },
         )
-        .subscribe();
+        .subscribe((status) => {
+          if (DEBUG) {
+            console.log(`[ChatStore] Companies channel status: ${status}`)
+          }
+        })
     },
 
     hasUnread(userId) {
@@ -210,6 +295,16 @@ export const useChatStore = defineStore("chat", {
         .eq("user_id", user.telegramId)
         .eq("sender", "user")
         .eq("is_read", false);
+    },
+
+    // Cleanup all channels - call this when logging out or unmounting
+    cleanupAllChannels() {
+      if (DEBUG) {
+        console.log('[ChatStore] Cleaning up all channels')
+      }
+      Object.keys(this.channels).forEach((channelName) => {
+        this.cleanupChannel(channelName)
+      })
     },
   },
 });
