@@ -12,9 +12,10 @@ const isUploading = ref(false);
 
 onMounted(() => {
   chatStore.fetchUsers();
-  chatStore.fetchMessages();  
+  chatStore.fetchMessages();
   chatStore.fetchCompanies();
-  
+  chatStore.initVisibilityListener();
+
   window.addEventListener("keydown", (e) => {
     if (e.key == "Escape") {
       chatStore.selectedUser = null;
