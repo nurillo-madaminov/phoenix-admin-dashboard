@@ -14,6 +14,7 @@ onMounted(() => {
   chatStore.fetchUsers();
   chatStore.fetchMessages();
   chatStore.fetchCompanies();
+  chatStore.initVisibilityListener();
 
   window.addEventListener("keydown", (e) => {
     if (e.key == "Escape") {
