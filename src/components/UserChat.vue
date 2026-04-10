@@ -54,6 +54,12 @@ const isCustomText = ref(false);
 async function sendTemplate() {
   sending.value = true;
 
+  if (!location.value.trim()) {
+    sending.value = false;
+    alert("Fill location");
+    return;
+  }
+
   if (isCustomText.value) {
     if (!customText.value.trim()) {
       sending.value = false;
@@ -62,7 +68,6 @@ async function sendTemplate() {
     }
   } else {
     if (
-      !location.value.trim() ||
       !date.value ||
       !startTime.value ||
       !endTime.value
@@ -365,15 +370,17 @@ function formatDate(date) {
   <Teleport to="body">
     <div
       v-if="isUploading"
-      class="absolute top-0 left-0 z-[9999] w-full h-screen flex items-center justify-center bg-black/50 backdrop-blur-sm dark:text-black"
+      class="absolute top-0 left-0 z-[9999] w-full h-screen flex items-center justify-center bg-black/50 backdrop-blur-sm dark:bg-black/70"
     >
-      <div class="w-full max-w-sm rounded bg-white p-6 shadow-2xl">
+      <div
+        class="w-full max-w-sm rounded border border-gray-200 bg-white p-6 text-gray-900 shadow-2xl dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
+      >
         <div
           v-if="uploadStatus === 'success'"
           class="flex flex-col items-center text-center"
         >
           <div
-            class="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-green-100 text-green-600"
+            class="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-green-100 text-green-600 dark:bg-green-950 dark:text-green-300"
           >
             <svg
               class="h-7 w-7"
@@ -389,18 +396,22 @@ function formatDate(date) {
               />
             </svg>
           </div>
-          <h2 class="text-xl font-semibold text-gray-800">File sent</h2>
-          <p class="mt-2 max-w-full truncate text-sm text-gray-500">
+          <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">
+            File sent
+          </h2>
+          <p class="mt-2 max-w-full truncate text-sm text-gray-500 dark:text-gray-300">
             {{ uploadedFileName }}
           </p>
         </div>
 
         <div v-else class="flex flex-col items-center text-center">
-          <span class="loading loading-spinner loading-xl text-blue-600"></span>
-          <h2 class="mt-4 text-xl font-semibold text-gray-800">
+          <span
+            class="loading loading-spinner loading-xl text-blue-600 dark:text-blue-300"
+          ></span>
+          <h2 class="mt-4 text-xl font-semibold text-gray-800 dark:text-gray-100">
             Sending file
           </h2>
-          <p class="mt-2 max-w-full truncate text-sm text-gray-500">
+          <p class="mt-2 max-w-full truncate text-sm text-gray-500 dark:text-gray-300">
             {{ uploadedFileName }}
           </p>
         </div>
@@ -409,16 +420,19 @@ function formatDate(date) {
   </Teleport>
   <Teleport to="body">
     <div
-      @keydown.enter="sendTemplate"
       v-if="showModal"
-      class="absolute top-0 left-0 bg-[#00000083] w-full h-screen z-9999 flex justify-center items-center dark:text-black"
+      class="absolute top-0 left-0 bg-[#00000083] w-full h-screen z-9999 flex justify-center items-center"
       @click.self="showModal = false"
     >
-      <div class="bg-white w-fit p-5 rounded">
+      <div
+        class="bg-white w-fit p-5 rounded text-gray-900 shadow-2xl dark:bg-gray-800 dark:text-gray-100"
+      >
         <div class="leading-8">
           <div class="flex items-center justify-between">
             <span>#update</span>
-            <div class="flex items-center gap-2 border px-2 rounded">
+            <div
+              class="flex items-center gap-2 border border-gray-200 px-2 rounded dark:border-gray-600"
+            >
               <label for="check">Custom text:</label>
               <input
                 v-model="isCustomText"
@@ -429,7 +443,10 @@ function formatDate(date) {
             </div>
           </div>
           📍
-          <select v-model="service">
+          <select
+            v-model="service"
+            class="rounded border border-gray-300 bg-white px-1 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100"
+          >
             <option value="CYCLE">CYCLE</option>
             <option value="SHIFT">SHIFT</option>
             <option value="BREAK">BREAK</option>
@@ -437,7 +454,7 @@ function formatDate(date) {
           updated location:<br />
           <input
             type="text"
-            class="border-b w-full leading-normal"
+            class="border-b border-gray-300 bg-transparent w-full leading-normal dark:border-gray-600"
             v-model="location"
           />
           <br />
@@ -445,7 +462,7 @@ function formatDate(date) {
             <div v-if="isCustomText" class="h-20 my-2">
               <textarea
                 v-model="customText"
-                class="textarea w-full dark:bg-white dark:border-gray-300"
+                class="textarea w-full bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100 dark:border-gray-600"
                 placeholder="Custom text"
               ></textarea>
             </div>
@@ -453,26 +470,29 @@ function formatDate(date) {
               📅Date:
               <input
                 type="text"
-                class="border-b leading-normal"
+                class="border-b border-gray-300 bg-transparent leading-normal dark:border-gray-600"
                 v-model="date"
               /><br />
               🕙 Time: From
               <input
                 type="text"
-                class="border-b w-30 leading-normal"
+                class="border-b border-gray-300 bg-transparent w-30 leading-normal dark:border-gray-600"
                 v-model="startTime"
               />
               to
               <input
                 type="text"
-                class="border-b w-30 leading-normal"
+                class="border-b border-gray-300 bg-transparent w-30 leading-normal dark:border-gray-600"
                 v-model="endTime"
               />
             </div>
           </div>
 
           You were at this location during the time listed above.<br />
-          <select v-model="billOfLeading">
+          <select
+            v-model="billOfLeading"
+            class="rounded border border-gray-300 bg-white px-1 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100"
+          >
             <option value="">Leave here empty</option>
             <option value="No need to change the BOL✅">
               No need to change the BOL ✅
@@ -484,7 +504,9 @@ function formatDate(date) {
             </option>
           </select>
           <br />
-          <div class="border border-dotted rounded mt-3 px-3">
+          <div
+            class="border border-dotted border-gray-300 rounded mt-3 px-3 dark:border-gray-600"
+          >
             🔴 Please pay attention to the following:<br />
             🔺 Make sure your profile is filled out correctly<br />
             🔺 If you pick up a load, don’t forget to send the documents<br />
@@ -493,7 +515,8 @@ function formatDate(date) {
           🦅 Best regards, PHOENIX ELD SERVICE 🤝
         </div>
         <button
-          @click="sendTemplate(e)"
+          type="button"
+          @click="sendTemplate"
           class="btn btn-active btn-info w-full mt-5 text-white"
         >
           <span
