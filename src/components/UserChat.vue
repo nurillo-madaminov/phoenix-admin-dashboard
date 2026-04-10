@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { onBeforeUnmount, ref } from "vue";
 import { useChatStore } from "../store/chat";
 import { supabase } from "../lib/supabase";
 import uploadFile from "../composables/uploadFile";
@@ -128,31 +128,70 @@ function isLastInGroup(index) {
 }
 
 const isUploading = ref(false);
+const uploadStatus = ref("idle");
+const uploadedFileName = ref("");
+let uploadSuccessTimer = null;
+
+function resetUploadState() {
+  isUploading.value = false;
+  uploadStatus.value = "idle";
+  uploadedFileName.value = "";
+}
 
 const handleFile = async (e) => {
-  isUploading.value = true;
-  const file = e.target.files[0];
-  const url = await uploadFile(file);
-  if (!url || !file.type.includes("pdf")) {
-    isUploading.value = false;
-    alert('Plase Upload PDF')
+  const file = e.target.files?.[0];
+  e.target.value = "";
+
+  if (!file) return;
+
+  const targetUserId = chatStore.selectedUser?.telegramId;
+  if (!targetUserId) return;
+
+  if (!file.type.includes("pdf")) {
+    alert("Please Upload PDF");
     return;
   }
 
-  const message = {
-    user_id: chatStore.selectedUser.telegramId,
-    sender: "admin",
-    type: "file",
+  isUploading.value = true;
+  uploadStatus.value = "loading";
+  uploadedFileName.value = file.name;
 
-    text: file.name, // display name
-    file_url: url, // actual file link
-    file_type: file.type, // 🔥 useful for UI (image/pdf/etc)
-  };
-  // optimistic UI
-  await supabase.from("messages").insert(message);
-  // console.log(e.target.files[0]);
-  isUploading.value = false;
+  try {
+    const url = await uploadFile(file);
+
+    if (!url) {
+      throw new Error("File upload failed");
+    }
+
+    const message = {
+      user_id: targetUserId,
+      sender: "admin",
+      type: "file",
+
+      text: file.name, // display name
+      file_url: url, // actual file link
+      file_type: file.type,
+    };
+    // optimistic UI
+    const { error } = await supabase.from("messages").insert(message);
+    if (error) {
+      throw error;
+    }
+
+    uploadStatus.value = "success";
+    uploadSuccessTimer = setTimeout(resetUploadState, 1200);
+  } catch (error) {
+    console.error(error);
+    resetUploadState();
+    alert("File could not be sent. Please try again.");
+  }
 };
+
+onBeforeUnmount(() => {
+  if (uploadSuccessTimer) {
+    clearTimeout(uploadSuccessTimer);
+  }
+});
 
 function isNewDate(index) {
   const messages = chatStore.filteredMessages;
@@ -215,7 +254,7 @@ function formatDate(date) {
           class="mb-4 chat-bubble max-w-2/3 min-w-28 relative"
           :class="{ 'before:hidden! mb-0!': !isLastInGroup(index) }"
         >
-          <p class="mb-1 mr-8 whitespace-pre-line break-words">
+          <p class="mb-1 mr-8 whitespace-pre-line wrap-break-word">
             <a
               v-if="message.type == 'file'"
               class="text-blue-500"
@@ -323,6 +362,51 @@ function formatDate(date) {
       </form>
     </div>
   </div>
+  <Teleport to="body">
+    <div
+      v-if="isUploading"
+      class="absolute top-0 left-0 z-[9999] w-full h-screen flex items-center justify-center bg-black/50 backdrop-blur-sm dark:text-black"
+    >
+      <div class="w-full max-w-sm rounded bg-white p-6 shadow-2xl">
+        <div
+          v-if="uploadStatus === 'success'"
+          class="flex flex-col items-center text-center"
+        >
+          <div
+            class="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-green-100 text-green-600"
+          >
+            <svg
+              class="h-7 w-7"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+          </div>
+          <h2 class="text-xl font-semibold text-gray-800">File sent</h2>
+          <p class="mt-2 max-w-full truncate text-sm text-gray-500">
+            {{ uploadedFileName }}
+          </p>
+        </div>
+
+        <div v-else class="flex flex-col items-center text-center">
+          <span class="loading loading-spinner loading-xl text-blue-600"></span>
+          <h2 class="mt-4 text-xl font-semibold text-gray-800">
+            Sending file
+          </h2>
+          <p class="mt-2 max-w-full truncate text-sm text-gray-500">
+            {{ uploadedFileName }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </Teleport>
   <Teleport to="body">
     <div
       @keydown.enter="sendTemplate"

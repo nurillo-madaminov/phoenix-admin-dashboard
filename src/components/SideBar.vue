@@ -1,4 +1,5 @@
 <script setup>
+import { computed, ref, watch } from "vue";
 import { useChatStore } from "../store/chat";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "vue-router";
@@ -13,7 +14,36 @@ const logout = async () => {
   router.push("/");
 };
 
-// const searchFor = ref('')
+const highlightedSearchIndex = ref(0);
+
+const searchResults = computed(() => chatStore.searchUser || []);
+
+function selectSearchUser(user) {
+  if (!user) return;
+
+  chatStore.selectUser(user);
+  chatStore.searchFor = "";
+  highlightedSearchIndex.value = 0;
+}
+
+function moveSearchHighlight(direction) {
+  if (!searchResults.value.length) return;
+
+  highlightedSearchIndex.value =
+    (highlightedSearchIndex.value + direction + searchResults.value.length) %
+    searchResults.value.length;
+}
+
+function selectHighlightedUser() {
+  selectSearchUser(searchResults.value[highlightedSearchIndex.value]);
+}
+
+watch(
+  () => chatStore.searchFor,
+  () => {
+    highlightedSearchIndex.value = 0;
+  },
+);
 </script>
 
 <template>
@@ -40,20 +70,29 @@ const logout = async () => {
           </svg>
           <input
             v-model="chatStore.searchFor"
-            type="Search for drivers"
+            @keydown.down.prevent="moveSearchHighlight(1)"
+            @keydown.up.prevent="moveSearchHighlight(-1)"
+            @keydown.enter.prevent="selectHighlightedUser"
+            @keydown.esc="chatStore.searchFor = ''"
+            type="search"
             required
             placeholder="Search"
           />
         </label>
 
-        <ul class="list bg-base-100 rounded-box shadow-md absolute z-10 w-full">
+        <ul
+          v-if="searchResults.length"
+          class="list bg-base-100 rounded-box shadow-md absolute z-10 w-full"
+        >
           <li
-            class="list-row"
-            v-for="user in chatStore.searchUser"
-            @click="
-              chatStore.selectedUser = user;
-              chatStore.searchFor = '';
-            "
+            class="list-row cursor-pointer"
+            :class="{
+              'bg-blue-100 text-blue-700': index === highlightedSearchIndex,
+            }"
+            v-for="(user, index) in searchResults"
+            :key="user.telegramId"
+            @mouseenter="highlightedSearchIndex = index"
+            @mousedown.prevent="selectSearchUser(user)"
           >
             {{ user.fullName }}
           </li>
