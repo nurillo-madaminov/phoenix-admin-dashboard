@@ -21,11 +21,11 @@ function resetDragUploadState() {
   draggedFileName.value = "";
 }
 
-onMounted(() => {
-  chatStore.fetchUsers();
-  chatStore.fetchMessages();
-  chatStore.fetchCompanies();
-  chatStore.initVisibilityListener();
+onMounted(async () => {
+  await  chatStore.fetchUsers();
+  await chatStore.fetchMessages();
+  await chatStore.fetchCompanies();
+  // chatStore.initVisibilityListener();
 
   window.addEventListener("keydown", (e) => {
     if (e.key == "Escape") {
